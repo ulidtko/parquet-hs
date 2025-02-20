@@ -13,6 +13,7 @@ where
 
 import Control.Lens (makeLenses, makePrisms)
 import qualified Data.Aeson as JSON
+import qualified Data.Aeson.KeyMap as JSONKeyMap
 import Data.Binary (Binary (get, put))
 import Parquet.Prelude hiding (get, put)
 
@@ -64,7 +65,7 @@ data ParquetValue
 instance FromJSON ParquetValue where
   parseJSON = \case
     JSON.Object obj -> do
-      ParquetObject . MkParquetObject <$> traverse parseJSON obj
+      ParquetObject . MkParquetObject . JSONKeyMap.toHashMapText <$> traverse parseJSON obj
     JSON.Array vec -> do
       ParquetList . MkParquetList . toList <$> traverse parseJSON vec
     JSON.Number sci ->

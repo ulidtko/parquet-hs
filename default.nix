@@ -1,4 +1,4 @@
-{ compiler ? "ghc901" }:
+{ compiler ? "ghc9101" }:
 
 let
   sources = import ./nix/sources.nix;
@@ -6,7 +6,7 @@ let
   # it's backported and we prefer using the release branch
   pkgs = import sources.nixpkgs { config.allowBroken = true; };
 
-  inherit (pkgs.haskell.lib) dontCheck;
+  inherit (pkgs.haskell.lib) dontCheck doJailbreak;
 
   baseHaskellPkgs = pkgs.haskell.packages.${compiler};
 
@@ -17,29 +17,22 @@ let
       # network `pinch` uses but it's causing issues here so instead we're
       # just disabling the test suite here as that's where the error is.
       pinch = dontCheck super.pinch;
-      relude = super.relude_1_0_0_1;
+      serialise = doJailbreak super.serialise;
     };
   };
 
   shell = myHaskellPackages.shellFor {
     packages = p: with p; [ parquet-hs ];
 
-    buildInputs = with pkgs.haskellPackages; [
+    buildInputs = with baseHaskellPkgs; [
       cabal-install
-      ghcid
+      haskell-language-server
+      hpack
       ormolu
-      hlint
+      pkgs.hlint
       pkgs.niv
       pkgs.nixpkgs-fmt
     ];
-
-    libraryHaskellDepends = [ ];
-
-    shellHook = ''
-      set -e
-      hpack
-      set +e
-    '';
   };
 
 in {
