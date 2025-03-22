@@ -173,6 +173,7 @@ import System.IO
     openFile,
   )
 import Text.Pretty.Simple (pString)
+import Control.Monad (foldM)
 
 ------------------------------------------------------------------------------
 type Url = String
