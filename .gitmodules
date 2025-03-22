@@ -1,0 +1,4 @@
+[submodule "apache-testing-data"]
+	path = tests/apache-data
+	url = https://github.com/apache/parquet-testing
+	branch = master
