@@ -1,6 +1,7 @@
 -- |
 module Parquet.Prelude
-  ( module X,
+  ( module X
+  , showPrettyT
   )
 where
 
@@ -16,4 +17,9 @@ import Relude as X hiding (Type)
 import Safe as X (headMay)
 import Safe.Exact as X (zipExactMay)
 
+import Text.Pretty.Simple (pShow)
+
 ------------------------------------------------------------------------------
+
+showPrettyT :: Show a => a -> Text
+showPrettyT = toStrict . Text.Pretty.Simple.pShow

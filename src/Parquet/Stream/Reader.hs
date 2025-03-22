@@ -26,7 +26,6 @@ import qualified Data.Conduit.Serialization.Binary as CB
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map as M
 import qualified Data.Text as T
-import qualified Data.Text.Lazy as LT
 import Parquet.Decoder (BitWidth (..), decodeBPBE, decodeRLEBPHybrid)
 import Parquet.Monad
 import qualified Parquet.Pinch as TT
@@ -34,7 +33,6 @@ import Parquet.Prelude
 import qualified Parquet.Types as TT
 import Parquet.Utils ((<??>))
 import qualified Pinch
-import Text.Pretty.Simple (pString)
 
 data ColumnValue = ColumnValue
   { _cvRepetitionLevel :: Word32,
@@ -92,8 +90,8 @@ dataPageReader header mb_dict = do
       num_values
   level_data <- zip_level_data rep_data def_data
   path <- asks _pcPath
-  logInfo $ LT.toStrict $ pString $ show path
-  logInfo $ LT.toStrict $ pString $ show level_data
+  logInfo $ showPrettyT path
+  logInfo $ showPrettyT level_data
   read_page_content path encoding level_data num_values (fromIntegral max_def_level)
   pure ()
   where
@@ -139,7 +137,7 @@ dataPageReader header mb_dict = do
                   (_, val) <- decodeValue
                   pure (ColumnValue r d max_def_level val)
                 | otherwise -> pure $ ColumnValue r d max_def_level Null
-          logInfo $ "Values (" <> T.pack (show path) <> "): " <> (LT.toStrict $ pString $ show vals)
+          logInfo $ "Values (" <> show path <> "): " <> showPrettyT vals
           C.yieldMany vals
         (Just _, TT.PLAIN _) ->
           throwError
@@ -150,7 +148,7 @@ dataPageReader header mb_dict = do
             CB.sinkGet $
               decodeRLEBPHybrid (BitWidth bit_width) num_values
           vals <- construct_dict_values max_def_level dict level_data val_indexes
-          logInfo $ "Values: " <> (LT.toStrict $ pString $ show vals)
+          logInfo $ "Values: " <> showPrettyT vals
           C.yieldMany vals
         (Nothing, TT.PLAIN_DICTIONARY _) ->
           throwError
@@ -344,7 +342,7 @@ readPage ::
 readPage 0 _ = pure ()
 readPage remaining mb_dict = do
   (page_header_size, page_header :: TT.PageHeader) <- decodeConduit remaining
-  logInfo $ LT.toStrict $ pString $ show page_header
+  logInfo $ showPrettyT page_header
   let page_content_size = page_header ^. TT.pinchField @"uncompressed_page_size"
   let validate_consumed_page_bytes consumed =
         unless (fromIntegral page_content_size == consumed) $

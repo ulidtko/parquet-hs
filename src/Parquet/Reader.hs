@@ -146,7 +146,6 @@ import qualified Data.HashMap.Strict as HM
 import qualified Data.Map as M
 import qualified Data.Sequence as Seq
 import qualified Data.Text as T
-import qualified Data.Text.Lazy as LT
 import Network.HTTP.Client (Request (requestHeaders))
 import Network.HTTP.Simple
   ( Header,
@@ -172,7 +171,6 @@ import System.IO
     hSeek,
     openFile,
   )
-import Text.Pretty.Simple (pString)
 import Control.Monad (foldM)
 
 ------------------------------------------------------------------------------
@@ -470,9 +468,9 @@ mkInstructions ::
   (ColumnValue, [Text]) ->
   m (Maybe InstructionSet)
 mkInstructions (c, path) = do
-  logInfo $ "Creating instruction for column value: " <> T.pack (show c) <> " and path " <> T.intercalate "." path
+  logInfo $ "Creating instruction for column value: " <> show c <> " and path " <> T.intercalate "." path
   result <- go [] (c, path)
-  logInfo $ "Instruction set: " <> T.pack (show result)
+  logInfo $ "Instruction set: " <> show result
   pure result
   where
     go :: [Text] -> (ColumnValue, [Text]) -> m (Maybe InstructionSet)
@@ -573,7 +571,7 @@ sourceRowGroup ::
   TT.RowGroup ->
   C.ConduitT () ParquetValue m ()
 sourceRowGroup source rg = do
-  logInfo $ "Parsing new row group. Metadata: " <> LT.toStrict (pString (show rg))
+  logInfo $ "Parsing new row group. Metadata: " <> showPrettyT rg
   C.sequenceSources
     ( map
         ( \cc ->
@@ -642,9 +640,9 @@ interpretInstructions ::
 interpretInstructions parquetVal is = do
   logInfo $
     "Interpreting instructions: "
-      <> T.pack (show parquetVal)
+      <> show parquetVal
       <> ", "
-      <> T.pack (show is)
+      <> show is
   case (parquetVal, is) of
     (EmptyValue, Seq.Empty) -> pure parquetVal
     (ParquetNull, _) -> pure ParquetNull
@@ -658,7 +656,7 @@ interpretInstructions parquetVal is = do
         v ->
           throwError $
             "Wrong parquet value "
-              <> T.pack (show v)
+              <> show v
               <> " type for instruction IListElement"
       IListElement -> case pv of
         ParquetList (MkParquetList xs) -> case reverse xs of
@@ -726,8 +724,8 @@ sourceColumnChunk (ParquetSource source) cc = do
   metadata <- ask
   schema_mapping <- readSchemaMapping
   let offset = cc ^. TT.pinchField @"file_offset"
-  logInfo $ "Schema 1: " <> LT.toStrict (pString $ show schema_mapping)
-  logInfo $ "Schema 2: " <> LT.toStrict (pString $ show (metadata ^. TT.pinchField @"schema"))
+  logInfo $ "Schema 1: " <> showPrettyT schema_mapping
+  logInfo $ "Schema 2: " <> showPrettyT (metadata ^. TT.pinchField @"schema")
   root <- readSchemaRoot
   source (fromIntegral offset)
     C..| C.transPipe failOnExcept (readColumnChunk root schema_mapping cc)
