@@ -77,6 +77,7 @@ tests:
     - QuickCheck
     - bytestring
     - binary
+
   pyspark-integration:
     main: Main.hs
     source-dirs: tests/integration
@@ -98,3 +99,18 @@ tests:
     - conduit
     - monad-logger
     - pretty-simple
+
+  apache-compat:
+    source-dirs: tests/conformance
+    build-tools: hspec:hspec-discover
+    main: Main.hs
+    ghc-options: -Wno-missing-signatures -Wno-incomplete-uni-patterns
+    dependencies:
+    - parquet-hs
+    - hspec
+    - hspec-discover
+    - directory
+    - filepath
+    - resourcet
+    - monad-logger
+    - mtl

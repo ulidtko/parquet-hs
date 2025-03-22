@@ -86,6 +86,48 @@ library
     , vector
   default-language: Haskell2010
 
+test-suite apache-compat
+  type: exitcode-stdio-1.0
+  main-is: Main.hs
+  other-modules:
+      BadDataSpec
+      GoodDataSpec
+      SpecHook
+      Paths_parquet_hs
+  hs-source-dirs:
+      tests/conformance
+  default-extensions:
+      DataKinds
+      DeriveAnyClass
+      DeriveGeneric
+      DerivingStrategies
+      FlexibleContexts
+      GeneralizedNewtypeDeriving
+      OverloadedStrings
+      LambdaCase
+      MultiWayIf
+      NamedFieldPuns
+      NoImplicitPrelude
+      ScopedTypeVariables
+      TypeApplications
+      TypeOperators
+      TypeFamilies
+      ViewPatterns
+  ghc-options: -Wall -O2 -fspecialise-aggressively -Wno-missing-signatures -Wno-incomplete-uni-patterns
+  build-tool-depends:
+      hspec:hspec-discover
+  build-depends:
+      base >=4.7 && <5
+    , directory
+    , filepath
+    , hspec
+    , hspec-discover
+    , monad-logger
+    , mtl
+    , parquet-hs
+    , resourcet
+  default-language: Haskell2010
+
 test-suite parquet-hs-unit
   type: exitcode-stdio-1.0
   main-is: Spec.hs
