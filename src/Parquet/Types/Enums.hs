@@ -25,10 +25,15 @@ data ColumnCryptoMetaData
   | ColumnCryptoMetaData_ENCRYPTION_WITH_COLUMN_KEY (Field 2 EncryptionWithColumnKey)
   deriving (Show, Eq, Generic, Pinchable, Binary)
 
+{- HLINT ignore ColumnCryptoMetaData "Use camelCase" -}
+
 ------------------------------------------------------------------------------
 data ColumnOrder
   = ColumnOrder_TYPE_ORDER (Field 1 TypeDefinedOrder)
   deriving (Show, Eq, Generic, Pinchable, Binary)
+
+{- HLINT ignore ColumnOrder "Use camelCase" -}
+{- HLINT ignore ColumnOrder "Use newtype instead of data" -}
 
 ------------------------------------------------------------------------------
 data CompressionCodec

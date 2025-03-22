@@ -310,7 +310,7 @@ sourceRowGroupFromRemoteFile ::
   String ->
   TT.RowGroup ->
   C.ConduitT () ParquetValue m ()
-sourceRowGroupFromRemoteFile url rg = sourceRowGroup (remoteParquetFile url) rg
+sourceRowGroupFromRemoteFile url = sourceRowGroup (remoteParquetFile url)
 
 ------------------------------------------------------------------------------
 throwOnNothing :: MonadError err m => err -> Maybe a -> m a
@@ -479,7 +479,7 @@ mkInstructions (c, path) = do
     go pathSoFar columnValue = do
       schema_mapping <- readSchemaMapping
       schema_root <- readSchemaRoot
-      instrx <- case columnValue of
+      case columnValue of
         (ColumnValue r d md v, fieldName : restPath) -> do
           let fullPathSoFar = T.intercalate "." $ pathSoFar <> [fieldName]
           case M.lookup (schema_root ^. TT.pinchField @"name" <> "." <> fullPathSoFar) schema_mapping of
@@ -535,7 +535,6 @@ mkInstructions (c, path) = do
         (ColumnValue {}, []) ->
           Nothing
             <$ logWarn "Saw column with nonzero rep/def levels and empty path."
-      pure instrx
 
 ------------------------------------------------------------------------------
 newtype ColumnConstructor = ColumnConstructor
