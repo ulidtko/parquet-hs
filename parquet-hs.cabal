@@ -86,9 +86,44 @@ library
     , vector
   default-language: Haskell2010
 
-test-suite parquet-hs-integration
+test-suite parquet-hs-unit
   type: exitcode-stdio-1.0
   main-is: Spec.hs
+  other-modules:
+      Parquet.Decoder.Spec
+      Paths_parquet_hs
+  hs-source-dirs:
+      tests/unit
+  default-extensions:
+      DataKinds
+      DeriveAnyClass
+      DeriveGeneric
+      DerivingStrategies
+      FlexibleContexts
+      GeneralizedNewtypeDeriving
+      OverloadedStrings
+      LambdaCase
+      MultiWayIf
+      NamedFieldPuns
+      NoImplicitPrelude
+      ScopedTypeVariables
+      TypeApplications
+      TypeOperators
+      TypeFamilies
+      ViewPatterns
+  ghc-options: -Wall -O2 -fspecialise-aggressively -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      QuickCheck
+    , base >=4.7 && <5
+    , binary
+    , bytestring
+    , hspec
+    , parquet-hs
+  default-language: Haskell2010
+
+test-suite pyspark-integration
+  type: exitcode-stdio-1.0
+  main-is: Main.hs
   other-modules:
       Paths_parquet_hs
   hs-source-dirs:
@@ -126,39 +161,4 @@ test-suite parquet-hs-integration
     , pretty-simple
     , process
     , text
-  default-language: Haskell2010
-
-test-suite parquet-hs-unit
-  type: exitcode-stdio-1.0
-  main-is: Spec.hs
-  other-modules:
-      Parquet.Decoder.Spec
-      Paths_parquet_hs
-  hs-source-dirs:
-      tests/unit
-  default-extensions:
-      DataKinds
-      DeriveAnyClass
-      DeriveGeneric
-      DerivingStrategies
-      FlexibleContexts
-      GeneralizedNewtypeDeriving
-      OverloadedStrings
-      LambdaCase
-      MultiWayIf
-      NamedFieldPuns
-      NoImplicitPrelude
-      ScopedTypeVariables
-      TypeApplications
-      TypeOperators
-      TypeFamilies
-      ViewPatterns
-  ghc-options: -Wall -O2 -fspecialise-aggressively -threaded -rtsopts -with-rtsopts=-N
-  build-depends:
-      QuickCheck
-    , base >=4.7 && <5
-    , binary
-    , bytestring
-    , hspec
-    , parquet-hs
   default-language: Haskell2010

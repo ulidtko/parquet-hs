@@ -77,8 +77,8 @@ tests:
     - QuickCheck
     - bytestring
     - binary
-  parquet-hs-integration:
-    main: Spec.hs
+  pyspark-integration:
+    main: Main.hs
     source-dirs: tests/integration
     ghc-options:
       - -threaded
