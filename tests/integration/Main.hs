@@ -6,6 +6,7 @@ import Parquet.Prelude hiding (unwords)
 import Data.String (unwords)
 
 import Conduit (runResourceT)
+import Control.Exception (handle)
 import Control.Monad.Logger
 import qualified Data.Aeson as JSON
 import qualified Data.ByteString.Lazy as LBS
@@ -51,6 +52,7 @@ testParquetFormat inputFile performTest = do
 
 main :: IO ()
 main = hspec $
+  verifyPysparkInstalled $ do
   describe "Reader" $ do
     it "can read columns" $ do
       testParquetFormat "input1.json" $ \parqFile -> do
@@ -62,3 +64,15 @@ main = hspec $
           Right v -> do
             origJson :: Maybe JSON.Value <- JSON.decode <$> LBS.readFile (testDataPath </> "input1.json")
             Just (JSON.encode v) `shouldBe` (JSON.encode <$> origJson)
+
+verifyPysparkInstalled :: Spec -> Spec
+verifyPysparkInstalled wrappedSpec =
+  runIO detectPyspark >>= \case
+    True -> wrappedSpec
+    False -> describe "Check dependencies" $
+                   it "runs with pyspark" $
+                   pendingWith "Test skipped -- no python3 & pyspark detected"
+  where
+    detectPyspark :: IO Bool
+    detectPyspark = handle (\(_ :: SomeException) -> pure False) $
+      callProcess "python3" ["-c", "import pyspark"] >> pure True
